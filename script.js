@@ -1,48 +1,38 @@
-// Aapka Discord Webhook URL
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1466314319347318941/NT-iHpONGm61Q4tfoUs9ojB8jEAJ7aG9Opzo-2G0pdb6dKkjTITZSB3Bt4NLQ6BwFnLs";
 
-// Aapka allowed email
-const allowedUsers = ["harsh48227@gmail.com"]; 
+// Aapka allowed email ya username
+const allowedUsers = ["harsh48227@gmail.com", "harsh"]; 
 
 async function sendDiscordAlert(msg) {
-    try {
-        await fetch(DISCORD_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: msg })
-        });
-    } catch (err) { console.log("Alert failed"); }
+    await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: msg })
+    });
 }
 
-// Search track karne ke liye function
-function initSearchTracking() {
-    const searchInput = document.getElementById('searchBox');
-    if (searchInput) {
-        searchInput.addEventListener('change', (e) => {
-            sendDiscordAlert(`🔍 **Search Activity:** User ne "${e.target.value}" search kiya.`);
-        });
-    }
-}
+// Ye function aapke "AUTHORIZE ACCESS" button ke liye hai
+function checkLogin() {
+    const userVal = document.getElementById('user').value;
+    const passVal = document.getElementById('pass').value;
 
-// Access check karne ke liye logic
-function checkAccess() {
-    let email = prompt("Is website ko dekhne ke liye apna Email dalein:");
-    
-    // Email ko lower case mein check karenge taaki error na ho
-    if (email && allowedUsers.includes(email.toLowerCase().trim())) {
-        sendDiscordAlert(`✅ **Login Success:** ${email} ne site access ki.`);
+    // Check agar user allowed list mein hai (Password aap apni marzi se badal sakte hain)
+    if (allowedUsers.includes(userVal.toLowerCase().trim()) && passVal === "1234") {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        sendDiscordAlert(`✅ **Login Success:** User "${userVal}" ne dashboard khola.`);
     } else {
-        sendDiscordAlert(`🚫 **Block Alert:** Unknown user (${email}) ne ghusne ki koshish ki. Access Denied!`);
-        document.body.innerHTML = `
-            <div style="text-align:center; margin-top:100px; font-family: sans-serif;">
-                <h1 style="color:red;">❌ Access Denied</h1>
-                <p>Aap is website ko dekhne ke liye authorized nahi hain.</p>
-            </div>`;
+        sendDiscordAlert(`🚫 **Block Alert:** Galat login koshish! User: "${userVal}", Pass: "${passVal}"`);
+        alert("ACCESS DENIED! Aap block hain.");
     }
 }
 
-// Page load hote hi sab chalu ho jaye
-window.onload = () => {
-    checkAccess();
-    initSearchTracking();
-};
+// Search track karne ke liye
+document.addEventListener('DOMContentLoaded', () => {
+    const searchBar = document.getElementById('searchBox');
+    if (searchBar) {
+        searchBar.addEventListener('change', (e) => {
+            sendDiscordAlert(`🔍 **Search Alert:** User ne search kiya: "${e.target.value}"`);
+        });
+    }
+});
