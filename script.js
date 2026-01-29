@@ -1,38 +1,42 @@
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1466314319347318941/NT-iHpONGm61Q4tfoUs9ojB8jEAJ7aG9Opzo-2G0pdb6dKkjTITZSB3Bt4NLQ6BwFnLs";
 
-// Aapka allowed email ya username
-const allowedUsers = ["harsh48227@gmail.com", "harsh"]; 
-
-async function sendDiscordAlert(msg) {
-    await fetch(DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: msg })
-    });
+// 1. Notification bhejne ka function
+async function sendAlert(msg) {
+    try {
+        await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: msg })
+        });
+    } catch (e) { console.log("Webhook error"); }
 }
 
-// Ye function aapke "AUTHORIZE ACCESS" button ke liye hai
+// 2. Login Function (Jo aapke button se connected hai)
 function checkLogin() {
     const userVal = document.getElementById('user').value;
     const passVal = document.getElementById('pass').value;
 
-    // Check agar user allowed list mein hai (Password aap apni marzi se badal sakte hain)
-    if (allowedUsers.includes(userVal.toLowerCase().trim()) && passVal === "1234") {
+    // Aapka email aur password yahan check hoga
+    if (userVal.toLowerCase().trim() === "harsh48227@gmail.com" && passVal === "1234") {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
-        sendDiscordAlert(`✅ **Login Success:** User "${userVal}" ne dashboard khola.`);
+        sendAlert(`✅ **Admin Login:** "${userVal}" ne dashboard open kiya!`);
     } else {
-        sendDiscordAlert(`🚫 **Block Alert:** Galat login koshish! User: "${userVal}", Pass: "${passVal}"`);
+        sendAlert(`🚫 **Block Attempt:** Galat login! User: ${userVal}, Pass: ${passVal}`);
         alert("ACCESS DENIED! Aap block hain.");
     }
 }
 
-// Search track karne ke liye
+// 3. Search Tracking (Target Number wale box ke liye)
 document.addEventListener('DOMContentLoaded', () => {
     const searchBar = document.getElementById('searchBox');
     if (searchBar) {
+        // Jab user box mein kuch likh kar enter dabayega ya bahar click karega
         searchBar.addEventListener('change', (e) => {
-            sendDiscordAlert(`🔍 **Search Alert:** User ne search kiya: "${e.target.value}"`);
+            const val = e.target.value;
+            if(val.trim() !== "") {
+                sendAlert(`🔍 **Search Alert:** User ne ye data search kiya: \`${val}\``);
+            }
         });
     }
 });
