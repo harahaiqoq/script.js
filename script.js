@@ -1,42 +1,83 @@
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1466314319347318941/NT-iHpONGm61Q4tfoUs9ojB8jEAJ7aG9Opzo-2G0pdb6dKkjTITZSB3Bt4NLQ6BwFnLs";
+<script>
+    // 1. Apne Credentials
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "harsh@786";
 
-// 1. Notification bhejne ka function
-async function sendAlert(msg) {
-    try {
-        await fetch(DISCORD_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: msg })
-        });
-    } catch (e) { console.log("Webhook error"); }
-}
+    // 2. Yahan apna asli Discord Webhook URL paste karein
+    const WEBHOOK_URL = "YAHAN_APNA_DISCORD_WEBHOOK_URL_DALO";
 
-// 2. Login Function (Jo aapke button se connected hai)
-function checkLogin() {
-    const userVal = document.getElementById('user').value;
-    const passVal = document.getElementById('pass').value;
-
-    // Aapka email aur password yahan check hoga
-    if (userVal.toLowerCase().trim() === "harsh48227@gmail.com" && passVal === "1234") {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-        sendAlert(`✅ **Admin Login:** "${userVal}" ne dashboard open kiya!`);
-    } else {
-        sendAlert(`🚫 **Block Attempt:** Galat login! User: ${userVal}, Pass: ${passVal}`);
-        alert("ACCESS DENIED! Aap block hain.");
+    // 3. Discord par message bhejane wala function
+    async function sendDiscord(message) {
+        if(!WEBHOOK_URL.includes("discord.com")) return;
+        try {
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: `🚀 **HARSH PRO SYSTEM ALERT**\n━━━━━━━━━━━━━━━━━━━━\n${message}\n━━━━━━━━━━━━━━━━━━━━`
+                })
+            });
+        } catch (err) {
+            console.error("Discord Error:", err);
+        }
     }
-}
 
-// 3. Search Tracking (Target Number wale box ke liye)
-document.addEventListener('DOMContentLoaded', () => {
-    const searchBar = document.getElementById('searchBox');
-    if (searchBar) {
-        // Jab user box mein kuch likh kar enter dabayega ya bahar click karega
-        searchBar.addEventListener('change', (e) => {
-            const val = e.target.value;
-            if(val.trim() !== "") {
-                sendAlert(`🔍 **Search Alert:** User ne ye data search kiya: \`${val}\``);
-            }
-        });
+    // 4. Login function with Alert
+    function checkLogin() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if (u === ADMIN_USER && p === ADMIN_PASS) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            sendDiscord(`✅ **Admin Login Success!**\n👤 User: ${u}\n🕒 Time: ${new Date().toLocaleString()}`);
+        } else {
+            sendDiscord(`⚠️ **Failed Login Attempt!**\n👤 Input User: ${u}\n🔑 Input Pass: ${p}\n📍 Check System Security!`);
+            alert("ACCESS DENIED: Wrong Credentials!");
+        }
     }
-});
+
+    // 5. Search function with Alert
+    async function run(ep, key) {
+        const val = document.getElementById('inp').value;
+        const res = document.getElementById('res');
+        if(!val) return alert("Pehle target data dalo!");
+
+        res.style.display = 'block';
+        res.innerHTML = "Accessing Secured Database...";
+
+        // Discord Alert for Search
+        sendDiscord(`🔍 **New Search Performed**\n🛠️ Method: ${ep.toUpperCase()}\n🎯 Target: \`${val}\``);
+
+        try {
+            const url = `https://api.b77bf911.workers.dev/${ep}?${key}=${val}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            res.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (e) {
+            res.innerHTML = "Error: API Response Fail!";
+            sendDiscord(`❌ **API Error!**\nTarget: ${val}\nIssue: Fetch Failed.`);
+        }
+    }
+
+    // 6. IP Tracker with Alert
+    async function runIP() {
+        const val = document.getElementById('inp').value;
+        const res = document.getElementById('res');
+        if(!val) return alert("IP address dalo!");
+
+        res.style.display = 'block';
+        res.innerHTML = "Tracking Target IP...";
+        
+        sendDiscord(`🌐 **IP Tracking Started**\n📍 Target IP: \`${val}\``);
+
+        try {
+            const response = await fetch(`https://ipapi.co/${val}/json/`);
+            const data = await response.json();
+            res.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (e) {
+            res.innerHTML = "Error: IP Tracking Fail!";
+        }
+    }
+</script>
+        
